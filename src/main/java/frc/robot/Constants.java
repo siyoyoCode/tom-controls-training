@@ -25,6 +25,10 @@ public final class Constants {
     public static final double PIVOT_I = 0;
     public static final double PIVOT_D = 0;
     public static final double PIVOT_CONVERSION_FACTOR = 0.2142;
+  }
 
-}
+  public static class RollerConstants {
+    public static final int INTEGRATION_MOTOR_ID_MOTOR_ID = 19;
+    public static final int FRONT_MOTOR_ID = 17;
+  }
 }

@@ -5,9 +5,15 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.IntakePivotSetPositionCommand;
+import frc.robot.commands.SetRollerSpeedCommand;
 import frc.robot.subsystems.IntakePivotSubsystem;
+import frc.robot.subsystems.RollerSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -19,10 +25,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final IntakePivotSubsystem IntakePivotSubsystem;
+  private final RollerSubsystem RollerSubsystem;
+  private final XboxController controller = new XboxController(2);
+  private final JoystickButton leftBumper = new JoystickButton(controller, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton rightBumper = new JoystickButton(controller, XboxController.Button.kRightBumper.value);
+  private final JoystickButton xButton = new JoystickButton(controller, XboxController.Button.kX.value);
+  private final JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     IntakePivotSubsystem = new IntakePivotSubsystem();
+    RollerSubsystem = new RollerSubsystem();
     configureBindings();
   }
 
@@ -36,8 +49,23 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    //origonal testing
+    //leftBumper.onTrue(new IntakePivotSetPositionCommand(IntakePivotSubsystem, 0));
+    //rightBumper.onTrue(new IntakePivotSetPositionCommand(IntakePivotSubsystem, 1));
 
+    //x button toggles intake pivot position
+    xButton.onTrue(new ConditionalCommand(
+        new IntakePivotSetPositionCommand(IntakePivotSubsystem, 0),
+        new IntakePivotSetPositionCommand(IntakePivotSubsystem, 1),
+        () -> IntakePivotSubsystem.getEncoderPosition() > .5
+    ));
+    
+    //b button stops roller
+    bButton.onTrue(new SetRollerSpeedCommand(RollerSubsystem, 0, 0));
 
+    //triggers set roller speed, speeds found in last year's code then divided by 10 because they were too fast
+    leftBumper.onTrue(new SetRollerSpeedCommand(RollerSubsystem, 0.07, 0.055));
+    rightBumper.onTrue(new SetRollerSpeedCommand(RollerSubsystem, -0.075, -0.1));
 
   }
 
